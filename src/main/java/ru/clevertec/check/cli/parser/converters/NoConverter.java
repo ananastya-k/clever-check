@@ -1,10 +1,12 @@
 package main.java.ru.clevertec.check.cli.parser.converters;
 
-public class StringConverter implements IStringConverter{
+import java.util.Optional;
+
+public class NoConverter implements IStringConverter{
 
     @Override
-    public Object convert(String s) {
-        return s;
+    public Optional<String> convert(String s) {
+        return Optional.of(s);
     }
 
     @Override

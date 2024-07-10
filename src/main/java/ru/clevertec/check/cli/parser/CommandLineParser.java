@@ -52,7 +52,7 @@ public class CommandLineParser {
      * @throws IllegalAccessException   If there is an error accessing the fields of the target object
      * @throws IntertalServerException  If an internal server error occurs
      */
-    public void parseAll() throws BadRequestException, IllegalAccessException, IntertalServerException {
+    public void parseAll() throws BadRequestException, IllegalAccessException, IntertalServerException, InstantiationException {
         Field[] fields = target.getClass().getDeclaredFields();
 
         for (Field field : fields) {
@@ -64,7 +64,7 @@ public class CommandLineParser {
         }
     }
 
-    private void parseField(Field field) throws BadRequestException, IllegalAccessException, IntertalServerException {
+    private void parseField(Field field) throws BadRequestException, IllegalAccessException, IntertalServerException, InstantiationException {
 
         FieldParser parser = strategiesFactory.getParser(field);
         parser.parse(field, args, target);

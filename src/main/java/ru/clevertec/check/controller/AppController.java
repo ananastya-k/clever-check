@@ -1,6 +1,8 @@
 package main.java.ru.clevertec.check.controller;
 
 import main.java.ru.clevertec.check.cli.parser.*;
+import main.java.ru.clevertec.check.cli.parser.validators.FileNameValidator;
+import main.java.ru.clevertec.check.cli.parser.validators.RegexValidator;
 import main.java.ru.clevertec.check.exceptions.*;
 import main.java.ru.clevertec.check.model.*;
 import main.java.ru.clevertec.check.services.impl.*;
@@ -21,20 +23,26 @@ public class AppController {
 
     private ProductService productService;
     private DiscountCardService discountCardService;
-    private final String PATH_TO_PRODUCTS_FILE = "./src/main/resources/products.csv";
+   // private final String PATH_TO_PRODUCTS_FILE = "./src/main/resources/products.csv";
     private final String PATH_TO_CARDS_FILE = "./src/main/resources/discountCards.csv";
 
     Parameters parameters;
 
     class Parameters {
-        @Parameter(name = "discountCard=", view = "\\d{4}", required = false)
+        @Parameter(name = "discountCard=", validateValueWith = RegexValidator.class, regex = "\\d{4}", required = false)
         Integer discountCardNumber = 0;
 
         @Parameter(name = "balanceDebitCard=")
         Double balanceDebitCard;
 
-        @Parameter(view = "^\\d{1,8}-\\d{1,8}$")
+        @Parameter(validateWith = "^\\d{1,8}-\\d{1,8}$")
         Map<Integer, Integer> selectedProducts = new HashMap<>();
+
+        @Parameter(name = "pathToFile=", validateValueWith = FileNameValidator.class)
+        String pathToFile;
+
+        @Parameter(name = "saveToFile=", validateValueWith = FileNameValidator.class)
+        String saveToFile;
     }
 
     public void start(String[] args) {
@@ -50,8 +58,12 @@ public class AppController {
             CommandLineParser pCL = new CommandLineParser(args, parameters);
             pCL.parseAll();
         } catch (BadRequestException e) {
-            ErrorHandler.writeToErrorFile("BAD REQUEST", e.getMessage());
-        } catch (IntertalServerException | IllegalAccessException e) {
+            if (parameters.saveToFile == null) {
+                ErrorHandler.writeToErrorFile("BAD REQUEST", e.getMessage());
+            } else {
+                ErrorHandler.writeToErrorFile("BAD REQUEST", e.getMessage(), parameters.saveToFile);
+            }
+        } catch (IntertalServerException | IllegalAccessException | InstantiationException e) {
             ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage());
         }
 
@@ -59,7 +71,7 @@ public class AppController {
 
     private void processServices() {
         try {
-            productService = new ProductService(PATH_TO_PRODUCTS_FILE);
+            productService = new ProductService(parameters.pathToFile);
             productService.load();
 
             discountCardService = new DiscountCardService(PATH_TO_CARDS_FILE);
@@ -102,7 +114,7 @@ public class AppController {
         try {
             System.out.println(receipt.toString());
             ReceiptSaver printer = new ReceiptSaver();
-            printer.generateCheck(receipt, "./result.csv");
+            printer.generateCheck(receipt, parameters.saveToFile);
         } catch (IOException e) {
             ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage());
         }

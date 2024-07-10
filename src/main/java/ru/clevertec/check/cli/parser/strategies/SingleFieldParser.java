@@ -15,7 +15,7 @@ public class SingleFieldParser implements FieldParser {
     private final ConvertersFactory factory = new ConvertersFactory();
     Parameter parameter;
     @Override
-    public void parse(Field field, String[] args, Object target) throws BadRequestException, IntertalServerException {
+    public void parse(Field field, String[] args, Object target) throws BadRequestException, IntertalServerException, InstantiationException, IllegalAccessException {
         this.parameter = field.getAnnotation(Parameter.class);
 
         for(String arg : args){
