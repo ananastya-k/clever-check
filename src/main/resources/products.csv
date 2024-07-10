@@ -7,7 +7,7 @@ id;description;price;quantity_in_stock;wholesale_product
 6;Packed tomatoes 350g;1.60;50;-
 7;Packed apples 1kg;2.78;18;-
 8;Packed oranges 1kg;3.20;12;-
-9;Packed bananas 1kg;1.10;25;+
+9;Packed bananas 1kg;1.10;25;true
 10;Packed beef fillet 1kg;12.8;7;-
 11;Packed pork fillet 1kg;8.52;14;-
 12;Packed chicken breasts 1kgSour;10.75;18;-

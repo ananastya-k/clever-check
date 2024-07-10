@@ -4,13 +4,17 @@ import main.java.ru.clevertec.check.cli.parser.*;
 import main.java.ru.clevertec.check.exceptions.*;
 import main.java.ru.clevertec.check.model.*;
 import main.java.ru.clevertec.check.services.impl.*;
-import main.java.ru.clevertec.check.view.Receipt;
-import main.java.ru.clevertec.check.view.ReceiptSaver;
+import main.java.ru.clevertec.check.utils.ErrorHandler;
+import main.java.ru.clevertec.check.view.*;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static main.java.ru.clevertec.check.utils.ErrorHandler.writeToErrorFile;
 
 public class AppController {
 
@@ -30,65 +34,77 @@ public class AppController {
         Double balanceDebitCard;
 
         @Parameter(view = "^\\d{1,8}-\\d{1,8}$")
-        Map<Integer,Integer> selectedProducts = new HashMap<>() ;
+        Map<Integer, Integer> selectedProducts = new HashMap<>();
     }
 
-    public void start(String[] args) throws NotEnoughMoneyException, BadRequestException, IOException {
+    public void start(String[] args) {
         processCommandLineArgs(args);
         processServices();
-        processOrder();
+        processReceipt();
+
     }
-    public void processCommandLineArgs(String[] args)  {
+
+    public void processCommandLineArgs(String[] args) {
         try {
             parameters = new Parameters();
             CommandLineParser pCL = new CommandLineParser(args, parameters);
             pCL.parseAll();
-            System.out.println(parameters.toString());
-        } catch (BadRequestException e){
-            System.out.println("bad req");
-        } catch (IntertalServerException | IllegalAccessException e){
-            System.out.println("server error");
+        } catch (BadRequestException e) {
+            ErrorHandler.writeToErrorFile("BAD REQUEST", e.getMessage());
+        } catch (IntertalServerException | IllegalAccessException e) {
+            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage());
         }
 
     }
 
-    private void  processServices ()  {
+    private void processServices() {
         try {
             productService = new ProductService(PATH_TO_PRODUCTS_FILE);
             productService.load();
 
             discountCardService = new DiscountCardService(PATH_TO_CARDS_FILE);
             discountCardService.load();
-        } catch (IOException e){
-            System.out.println("server error (io)");
+        } catch (IOException e) {
+            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage());
         }
 
     }
 
-    private void processOrder() throws BadRequestException, NotEnoughMoneyException, IOException {
-        OrderController controller = new OrderController(parameters);
+    private void processReceipt() {
+        try {
+            OrderController controller = new OrderController(parameters);
+            Optional<DiscountCard> discountCardO = discountCardService.getDiscountByNumber(parameters.discountCardNumber);
+            Order order;
+            Receipt receipt;
 
-        Optional<DiscountCard> discountCardO = discountCardService.getDiscountByNumber(parameters.discountCardNumber);
+            if (discountCardO.isPresent()) {
+                order = controller.createOrder(productService, discountCardO.get().getDiscountPercentage());
+                receipt = new Receipt(order, discountCardO.get(), parameters.balanceDebitCard);
+            } else {
+                order = controller.createOrder(productService, 0);
+                receipt = new Receipt(order, parameters.balanceDebitCard);
+            }
 
-        Order order;
-        Receipt receipt;
+            if (order.getTotalWithDiscount() > parameters.balanceDebitCard) {
+                ErrorHandler.writeToErrorFile("NOT ENOUGH MONEY",
+                        String.format("Total price with discount: %.2f$. Balance debit card: %.2f$", order.getTotalWithDiscount(), parameters.balanceDebitCard));
+            }
+            outReceipt(receipt);
 
-        if (discountCardO.isPresent()) {
-            order = controller.createOrder(productService, discountCardO.get().getDiscountPercentage());
-            receipt = new Receipt(order, discountCardO.get(), parameters.balanceDebitCard);
-        } else {
-            order = controller.createOrder(productService, 0);
-            receipt = new Receipt(order, parameters.balanceDebitCard);
+        } catch (BadRequestException ex) {
+                ErrorHandler.writeToErrorFile("BAD REQUEST", ex.getMessage());
         }
 
-        System.out.println(receipt.toString());
+    }
 
-        ReceiptSaver printer = new ReceiptSaver();
-        printer.generateCheck(receipt,"./Res.csv");
+    private void outReceipt(Receipt receipt) {
 
-        if (order.getTotalWithDiscount() > parameters.balanceDebitCard) {
-            throw new NotEnoughMoneyException("No money!");
+        try {
+            System.out.println(receipt.toString());
+            ReceiptSaver printer = new ReceiptSaver();
+            printer.generateCheck(receipt, "./result.csv");
+        } catch (IOException e) {
+            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage());
         }
-
     }
 }

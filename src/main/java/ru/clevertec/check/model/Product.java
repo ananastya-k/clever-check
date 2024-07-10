@@ -36,7 +36,8 @@ public class Product {
         this.description = map.get("description");
         this.price = Double.parseDouble(map.get("price"));
         this.quantity = Integer.parseInt(map.get("quantity_in_stock"));
-        this.wholesale = map.get("wholesale_product").equals("+");
+        this.wholesale = map.get("wholesale_product").equals("+")
+                      || map.get("wholesale_product").equals("true");
     }
 
     public String getDescription() {return description;}

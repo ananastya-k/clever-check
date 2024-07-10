@@ -1,46 +1,81 @@
 package main.java.ru.clevertec.check;
 
-
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+
 
 public class CheckRunner {
-    public static void main(String[] args)  {
 
-        try {
-            // Путь к вашему shell-скрипту
-            String scriptPath = "bin/compile.sh";
+    public static void main(String[] args) throws IOException {
 
-            // Создаем процесс для выполнения shell-скрипта
-            ProcessBuilder pb = new ProcessBuilder("bash", scriptPath);
-
-            // Устанавливаем рабочую директорию, если это необходимо
-            // pb.directory(new File("/path/to/your/directory"));
-
-            // Устанавливаем рабочую директорию
-            pb.directory(new java.io.File("."));
-            // Запускаем процесс
-            Process process = pb.start();
-
-            // Ждем завершения процесса
-            int exitCode = process.waitFor();
-
-            // Выводим сообщение о завершении процесса
-            if (exitCode == 0) {
-                System.out.println("Shell script executed successfully");
-            } else {
-                System.out.println("Shell script execution failed with error code: " + exitCode);
-            }
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        String os = System.getProperty("os.name").toLowerCase();
+        ProcessBuilder processBuilder;
+        if (os.contains("win")) {
+            generateBAT(args);
+            processBuilder = new ProcessBuilder("cmd.exe", "/c", "compile.bat");
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
+            generateSH(args);
+            processBuilder = new ProcessBuilder("bash", "compile.sh");
+        } else {
+            System.out.println("Can't define OS");
+            return;
         }
 
-
-    }
-/*
-    AppController controller = new AppController();
-    ProcessBuilder processBuilder = new ProcessBuilder("javac", "src/**.java");
         processBuilder.inheritIO();
+        Process process = processBuilder.start();
 
-*/
+        try {
+            int exitCode = process.waitFor();
+            System.out.println("Script exited with code: " + exitCode);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Script was interrupted");
+        }
+    }
+
+    private static void generateBAT(String[] args) throws IOException {
+        String path = "./compile.bat";
+
+        PrintWriter writer = new PrintWriter(new FileWriter(path));
+
+        writer.println("@echo off");
+        writer.println("setlocal");
+        writer.println("dir /s /B src\\*.java > sources.txt");
+        writer.println("javac @sources.txt -d out");
+        writer.print("java -cp out main.java.ru.clevertec.check.Main ");
+        for (String arg : args) {
+            writer.print(arg + " ");
+        }
+        writer.println();
+        writer.close();
+    }
+
+    private static void generateSH(String[] args) throws IOException {
+        String path = "./compile.sh";
+
+        PrintWriter writer = new PrintWriter(new FileWriter(path));
+
+        writer.println("#!/bin/bash");
+        writer.println("find src -name \"*.java\" > sources.txt");
+        writer.println("javac @sources.txt -d out");
+        writer.print("java -cp out main.java.ru.clevertec.check.Main ");
+        for (String arg : args) {
+            writer.print(arg + " ");
+        }
+        writer.println();
+        writer.close();
+
+        ProcessBuilder processBuilder = new ProcessBuilder("chmod", "+x", path);
+        Process process = processBuilder.start();
+        try {
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new IOException("Failed to make script executable, exit code: " + exitCode);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Script was interrupted while making executable");
+        }
+    }
 }

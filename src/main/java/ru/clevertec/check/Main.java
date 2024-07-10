@@ -11,9 +11,9 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws NotEnoughMoneyException, BadRequestException, IOException {
-        System.out.println("Main class executed successfully.");
+
         AppController controller = new AppController();
-        controller.start(new String[]{ "1-10","2-10","10-7","2-10", "discountCard=4414", "balanceDebitCard=90"});
+        controller.start(args);
 
     }
 }

@@ -32,13 +32,11 @@ public class OrderController {
         List<Goods> itemsToAdd = new ArrayList<>();
 
         for (Integer key : parameters.selectedProducts.keySet()) {
-
             Product product = ps.getProductById(key)
                     .orElseThrow(() -> new BadRequestException("Product с id: " + key + " not found"));
 
             if (product.getQuantity() < parameters.selectedProducts.get(key)) {
-                throw new BadRequestException("Insufficient quantity for product with id: "
-                        + key + ". There are " + product.getQuantity() + " in stock");
+                throw new BadRequestException("Insufficient quantity for product with id: " + key + ". There are " + product.getQuantity() + " in stock");
             }
 
             Goods item = createGoods(product, parameters.selectedProducts.get(key));
@@ -49,11 +47,13 @@ public class OrderController {
     private Goods createGoods(Product product, int quantity) {
 
         Goods item = new Goods(product, quantity);
+
         if (item.isWholesale() && quantity >= QTY_FOR_WHOLESALE_DISCOUNT) {
             item.setDiscountPercentage(WHOLESALE_DISCOUNT);
         } else {
             item.setDiscountPercentage(currentDiscount);
         }
+
         return item;
     }
 

@@ -48,21 +48,21 @@ public class Order {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        String separator = "-".repeat(5) + " | "
-                + "-".repeat(30) + " | "
-                + "-".repeat(5) + " | "
-                + "-".repeat(10) + " | "
-                + "-".repeat(10) + " | "
-                + "-".repeat(10) + " | "
-                + "-".repeat(15) + " | "
-                + "-".repeat(10) + " | " + "\n";
+        String separator = "|" + "-".repeat(5) + "|"
+                + "-".repeat(30) + "|"
+                + "-".repeat(5) + "|"
+                + "-".repeat(10) + "|"
+                + "-".repeat(10) + "|"
+                + "-".repeat(10) + "|"
+                + "-".repeat(15) + "|"
+                + "-".repeat(10) + "|" + "\n";
         str.append(separator);
-        str.append(String.format("%-5s | %-30s | %-5s | %-10s | %-10s | %-10s | %-15s | %-10s | \n",
+        str.append(String.format("|%-5s|%-30s|%-5s|%-10s|%-10s|%-10s|%-15s|%-10s| \n",
                 "Id", "Name", "QTY", "Price", "Total", "Discount","With discount", "Stock")).append(separator);
         goodsList.forEach(goods -> {
             str.append(goods.toString()).append(separator);
         });
-        str.append(String.format("%-5s | %-30s | %-5s | %-10s | %-10.2f | %-10.2f | %-15.2f | %-10s | \n",
+        str.append(String.format("|%-5s|%-30s|%-5s|%-10s|$%-9.2f|$%-9.2f|$%-14.2f|%-10s| \n",
                 "", "", "", "", totalPrice , totalPrice-totalWithDiscount, totalWithDiscount, "")).append(separator);
         return str.toString();
     }

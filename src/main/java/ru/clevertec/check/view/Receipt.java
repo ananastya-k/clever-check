@@ -45,10 +45,10 @@ public class Receipt {
     }
     @Override
     public String toString() {
-        return "Receipt\n\n" +
+        return "\nRECEIPT\n\n" +
                  order.toString() +
-                 discountCard.toString() +
-                 balance + "$ -> " + order.getCurrentBalance() + "$";
+                (discountCard == null ? " " : discountCard.toString()) +
+                 String.format("\nInitial balance on the card: %.2f$\n\nBalance on the card after payment: %.2f$\n\n", balance, order.getCurrentBalance());
     }
 
 }

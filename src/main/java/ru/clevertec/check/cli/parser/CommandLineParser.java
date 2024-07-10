@@ -36,12 +36,12 @@ public class CommandLineParser {
      * @param o The object to check
      * @throws BadRequestException If the parameter is missing or invalid
      */
-    private void checkRequired(Object o) throws BadRequestException {
+    private void checkRequired(Object o) throws BadRequestException, IllegalAccessException {
         Optional<Object> optional = Optional.ofNullable(o);
         if (optional.isEmpty()
                 || (optional.get() instanceof Collection && ((Collection<?>) optional.get()).isEmpty())
                 || (optional.get() instanceof Map && ((Map<?, ?>) optional.get()).isEmpty())) {
-            throw new BadRequestException("Missing required argument: " + o.toString());
+            throw new BadRequestException("Missing required argument");
         }
     }
 

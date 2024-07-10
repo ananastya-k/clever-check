@@ -48,9 +48,10 @@ public class Goods extends Product{
 
     @Override
     public String toString() {
-        return String.format("%-5s | %-30s | %-5d | %-10.2f$ | %-10.2f$ | %-10.2f$ | %-15.2f$ | %-10d | \n",
-                        this.getId(), this.getDescription(), amount, this.getPrice(),
-                        totalPrice, totalPrice - totalWithDiscount, totalWithDiscount, this.getQuantity() - amount);
+
+        return String.format("|%-5s|%-30s|%-5d|$%-9.2f|$%-9.2f|$%-9.2f|$%-14.2f|%-10d| \n",
+                this.getId(), this.getDescription(), amount, this.getPrice(),
+                totalPrice, totalPrice - totalWithDiscount, totalWithDiscount, this.getQuantity() - amount);
 
     }
 }

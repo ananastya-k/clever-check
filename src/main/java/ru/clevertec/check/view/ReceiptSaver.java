@@ -22,7 +22,6 @@ public class ReceiptSaver {
     private static final String[] DISCOUNT_SECTION_HEADER = {"DISCOUNT CARD", "DISCOUNT PERCENTAGE"};
     private static final String[] FOOTER_HEADER = {"TOTAL PRICE", "TOTAL DISCOUNT", "TOTAL WITH DISCOUNT"};
 
-    private List<String> components = new ArrayList<>();
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#0.00");
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -31,12 +30,10 @@ public class ReceiptSaver {
     private final String CSVDelimiter = ";";
 
     public void generateCheck(Receipt receipt, String filePath) throws IOException {
-        // Устанавливаем путь к файлу
+
         this.path = Path.of(filePath);
-        // Создаем новый файл, если он не существует, и очищаем его
         Files.write(path, new ArrayList<>(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-        // Формируем чек и записываем его по частям
         composeCheck(receipt);
     }
 
@@ -53,7 +50,7 @@ public class ReceiptSaver {
         List<String> lines = new ArrayList<>();
         lines.add(concat(META_HEADER));
         lines.add(concat(new String[]{now.format(dateFormatter), now.format(timeFormatter)}));
-        // Записываем в файл после формирования заголовка
+
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
@@ -61,7 +58,7 @@ public class ReceiptSaver {
         List<String> lines = new ArrayList<>();
         lines.add(concat(BODY_HEADER));
         order.getGoodsList().forEach(item -> addItemToList(item, lines));
-        // Записываем в файл после формирования тела
+
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
@@ -70,7 +67,7 @@ public class ReceiptSaver {
             List<String> lines = new ArrayList<>();
             lines.add(concat(DISCOUNT_SECTION_HEADER));
             addDiscountToList(discountCard, lines);
-            // Записываем в файл после формирования секции скидок
+
             Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         }
     }
@@ -82,7 +79,7 @@ public class ReceiptSaver {
                 formatPrice(order.getTotalPrice()) + "$",
                 formatPrice(order.getTotalPrice() - order.getTotalWithDiscount()) + "$",
                 formatPrice(order.getTotalWithDiscount()) + "$"));
-        // Записываем в файл после формирования подвала
+
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
