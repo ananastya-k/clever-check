@@ -15,15 +15,15 @@ import java.util.Map;
 public class Parameters {
 
     @Parameter(name = "discountCard=", view = "\\d{4}", required = false)
-    protected Integer discountCardNumber = 0;
+    private Integer discountCardNumber = 0;
     @Parameter(name = "balanceDebitCard=")
-    protected Double balanceDebitCard;
+    private Double balanceDebitCard;
     @Parameter(view = "^\\d{1,8}-\\d{1,8}$")
-    protected Map<Integer, Integer> selectedProducts = new HashMap<>();
+    private Map<Integer, Integer> selectedProducts = new HashMap<>();
     @Parameter(name = "pathToFile=")
-    protected String pathToFile;
+    private String pathToFile;
     @Parameter(name = "saveToFile=")
-    protected String saveToFile;
+    private String saveToFile;
 
     /**
      * Initializes parameters from command line arguments.
@@ -38,4 +38,43 @@ public class Parameters {
             cl.parse();
     }
 
+    public Integer getDCardNumber() {
+        return discountCardNumber;
+    }
+
+    public void setDCardNumber(Integer discountCardNumber) {
+        this.discountCardNumber = discountCardNumber;
+    }
+
+    public Double getBalance() {
+        return balanceDebitCard;
+    }
+
+    public void setBalance(Double balanceDebitCard) {
+        this.balanceDebitCard = balanceDebitCard;
+    }
+
+    public Map<Integer, Integer> getProducts() {
+        return selectedProducts;
+    }
+
+    public void setProducts(Map<Integer, Integer> selectedProducts) {
+        this.selectedProducts = selectedProducts;
+    }
+
+    public String getPathToFile() {
+        return pathToFile;
+    }
+
+    public void setPathToFile(String pathToFile) {
+        this.pathToFile = pathToFile;
+    }
+
+    public String getSaveToFile() {
+        return saveToFile;
+    }
+
+    public void setSaveToFile(String saveToFile) {
+        this.saveToFile = saveToFile;
+    }
 }

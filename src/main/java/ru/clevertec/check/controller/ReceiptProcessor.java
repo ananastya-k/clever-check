@@ -35,7 +35,7 @@ public class ReceiptProcessor {
     public void processReceipt() throws BadRequestException {
         OrderController controller = new OrderController(parameters);
         Optional<DiscountCard> discountOptional = services.getDiscountCardService()
-                                                        .getDiscountByNumber(parameters.discountCardNumber);
+                                                        .getDiscountByNumber(parameters.getDCardNumber());
 
         int discount = discountOptional.map(DiscountCard::getDiscountPercentage).orElse(0);
         Order order =  controller.createOrder(services.getProductService(), discount);
@@ -43,7 +43,7 @@ public class ReceiptProcessor {
 
         Receipt.Builder receiptBuilder = new Receipt.Builder()
                 .setOrder(order)
-                .setBalanceDebitCard(parameters.balanceDebitCard);
+                .setBalanceDebitCard(parameters.getBalance());
         discountOptional.ifPresent(receiptBuilder::setDiscountCard);
 
         Receipt receipt = receiptBuilder.build();
@@ -57,10 +57,10 @@ public class ReceiptProcessor {
      * @throws BadRequestException if there is a problem with the request
      */
     private void validateOrder(Order order) {
-        if (order.getTotalWithDiscount() > parameters.balanceDebitCard) {
+        if (order.getTotalWithDiscount() > parameters.getBalance()) {
             ErrorHandler.writeToErrorFile("NOT ENOUGH MONEY",
                     String.format("Total price with discount: %.2f$. Balance debit card: %.2f$",
-                            order.getTotalWithDiscount(), parameters.balanceDebitCard), parameters.saveToFile);
+                            order.getTotalWithDiscount(), parameters.getBalance()), parameters.getSaveToFile());
         }
     }
 
@@ -73,9 +73,9 @@ public class ReceiptProcessor {
         try {
             System.out.println(receipt.toString());
             ReceiptSaver printer = new ReceiptSaver();
-            printer.generateCheck(receipt, parameters.saveToFile);
+            printer.generateCheck(receipt, parameters.getSaveToFile());
         } catch (IOException e) {
-            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage(), parameters.saveToFile);
+            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage(), parameters.getSaveToFile());
         }
     }
 }

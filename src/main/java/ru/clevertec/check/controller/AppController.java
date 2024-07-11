@@ -24,7 +24,7 @@ public class AppController {
             parameters = new Parameters();
             parameters.init(args);
 
-            services = new ServiceInitializer(parameters.pathToFile);
+            services = new ServiceInitializer(parameters.getPathToFile());
             services.processServices();
 
             ReceiptProcessor receiptProcessor = new ReceiptProcessor(parameters, services);
@@ -45,8 +45,8 @@ public class AppController {
      * @param message the error message
      */
     private void handleError(String errorType, String message) {
-        if ( parameters.saveToFile != null) {
-            ErrorHandler.writeToErrorFile(errorType, message,  parameters.saveToFile);
+        if ( parameters.getSaveToFile() != null) {
+            ErrorHandler.writeToErrorFile(errorType, message,  parameters.getSaveToFile());
         } else {
             ErrorHandler.writeToErrorFile(errorType, message);
         }
