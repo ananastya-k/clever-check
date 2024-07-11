@@ -7,17 +7,35 @@ public class Receipt {
     private double balance;
     private DiscountCard discountCard;
 
-    public Receipt(Order order, DiscountCard discountCard, double balanceDebitCard) {
-
-        this.order = order;
-        this.discountCard = discountCard;
-        this.balance = balanceDebitCard;
+    private Receipt(Builder builder){
+        this.order = builder.order;
+        this.discountCard = builder.discountCard;
+        this.balance = builder.balance;
     }
-    public Receipt(Order order, double balanceDebitCard) {
 
-        this.order = order;
-        this.balance = balanceDebitCard;
+    public static class Builder {
+        private Order order;
+        private DiscountCard discountCard;
+        private double balance;
 
+        public Builder setOrder(Order order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder setDiscountCard(DiscountCard discountCard) {
+            this.discountCard = discountCard;
+            return this;
+        }
+
+        public Builder setBalanceDebitCard(double balanceDebitCard) {
+            this.balance = balanceDebitCard;
+            return this;
+        }
+
+        public Receipt build() {
+            return new Receipt(this);
+        }
     }
 
     public Order getOrder() {

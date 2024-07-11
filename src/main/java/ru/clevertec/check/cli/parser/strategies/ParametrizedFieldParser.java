@@ -39,7 +39,7 @@ public class ParametrizedFieldParser implements FieldParser {
                     .forEach(arg -> {
                         try {
                             setToMap( arg, keyType, valueType);
-                        } catch (IntertalServerException e) {
+                        } catch (IntertalServerException | BadRequestException e) {
                             throw new RuntimeException(e);
                         }
                     });
@@ -51,7 +51,7 @@ public class ParametrizedFieldParser implements FieldParser {
         }
     }
 
-    private void setToMap( String arg, Class<?> keyType, Class<?> valueType) throws IntertalServerException {
+    private void setToMap( String arg, Class<?> keyType, Class<?> valueType) throws IntertalServerException, BadRequestException {
 
         String value = arg.replace(parameter.name(), "");
         String[] splitArgs = value.split("[-:=]");
@@ -59,8 +59,8 @@ public class ParametrizedFieldParser implements FieldParser {
         Optional<?> k = (Optional<?>) factory.createConverter(keyType.getSimpleName()).convert(splitArgs[0]);
         Optional<?> v = (Optional<?>) factory.createConverter(valueType.getSimpleName()).convert(splitArgs[1]);
 
-        Object key = k.get();
-        Object val = v.get();
+        Object key = k.orElseThrow(() -> new BadRequestException("Key is null"));
+        Object val = v.orElseThrow(() -> new BadRequestException("Value is null"));
         Object currVal = map.getOrDefault(key, 0);
 
         if (currVal instanceof Number && val instanceof Number) {

@@ -10,10 +10,8 @@ import main.java.ru.clevertec.check.view.ReceiptSaver;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws NotEnoughMoneyException, BadRequestException, IOException {
-
+    public static void main(String[] args){
         AppController controller = new AppController();
         controller.start(args);
-
     }
 }

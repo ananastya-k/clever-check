@@ -34,41 +34,45 @@ public class CheckRunner {
         }
     }
 
-    private static void generateBAT(String[] args) throws IOException {
+    private static void generateBAT(String[] args) {
         String path = "./compile.bat";
 
-        PrintWriter writer = new PrintWriter(new FileWriter(path));
+        try(PrintWriter writer = new PrintWriter(new FileWriter(path))) {
 
-        writer.println("@echo off");
-        writer.println("setlocal");
-        writer.println("dir /s /B src\\*.java > sources.txt");
-        writer.println("javac @sources.txt -d out");
-        writer.print("java -cp out main.java.ru.clevertec.check.Main ");
-        for (String arg : args) {
-            writer.print(arg + " ");
+            writer.println("@echo off");
+            writer.println("setlocal");
+            writer.println("dir /s /B src\\*.java > sources.txt");
+            writer.println("javac @sources.txt -d out");
+            writer.print("java -cp out main.java.ru.clevertec.check.Main ");
+            for (String arg : args) {
+                writer.print(arg + " ");
+            }
+            writer.println();
+        } catch (IOException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Generation .bat failed with error: " + e.getMessage());
         }
-        writer.println();
-        writer.close();
     }
 
     private static void generateSH(String[] args) throws IOException {
+
         String path = "./compile.sh";
 
-        PrintWriter writer = new PrintWriter(new FileWriter(path));
+        try(PrintWriter writer = new PrintWriter(new FileWriter(path))) {
 
-        writer.println("#!/bin/bash");
-        writer.println("find src -name \"*.java\" > sources.txt");
-        writer.println("javac @sources.txt -d out");
-        writer.print("java -cp out main.java.ru.clevertec.check.Main ");
-        for (String arg : args) {
-            writer.print(arg + " ");
-        }
-        writer.println();
-        writer.close();
+            writer.println("#!/bin/bash");
+            writer.println("find src -name \"*.java\" > sources.txt");
+            writer.println("javac @sources.txt -d out");
+            writer.print("java -cp out main.java.ru.clevertec.check.Main ");
+            for (String arg : args) {
+                writer.print(arg + " ");
+            }
+            writer.println();
+            writer.close();
 
-        ProcessBuilder processBuilder = new ProcessBuilder("chmod", "+x", path);
-        Process process = processBuilder.start();
-        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("chmod", "+x", path);
+            Process process = processBuilder.start();
+
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 throw new IOException("Failed to make script executable, exit code: " + exitCode);
@@ -76,6 +80,10 @@ public class CheckRunner {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println("Script was interrupted while making executable");
+        } catch (IOException e){
+            Thread.currentThread().interrupt();
+            System.err.println("Generation .sh failed with error: " + e.getMessage());
+
         }
     }
 }

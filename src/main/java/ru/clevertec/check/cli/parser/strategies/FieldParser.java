@@ -2,12 +2,10 @@ package main.java.ru.clevertec.check.cli.parser.strategies;
 
 import com.sun.jdi.InternalException;
 import main.java.ru.clevertec.check.cli.parser.Parameter;
-import main.java.ru.clevertec.check.cli.parser.validators.IValueValidator;
 import main.java.ru.clevertec.check.exceptions.BadRequestException;
 import main.java.ru.clevertec.check.exceptions.IntertalServerException;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 public interface FieldParser {
 
@@ -20,7 +18,7 @@ public interface FieldParser {
      * @throws BadRequestException   If a required argument is missing or invalid
      * @throws InternalException     If an internal server error occurs
      */
-    void parse(Field field, String[] args, Object target) throws BadRequestException, IntertalServerException, InstantiationException, IllegalAccessException;
+    void parse(Field field, String[] args, Object target) throws BadRequestException, IntertalServerException;
 
     /**
      * Checks if the argument matches the parameter's name or view.
@@ -29,9 +27,9 @@ public interface FieldParser {
      * @param arg               The argument (cl) to check
      * @return true if the argument matches the parameter, false otherwise
      */
-     default boolean isMatchingArg(Parameter parameter, String arg) {
+    default boolean isMatchingArg(Parameter parameter, String arg) {
         return ((!parameter.name().isEmpty() && arg.startsWith(parameter.name()))
-                || arg.matches(parameter.validateWith()));
+                || arg.matches(parameter.view()));
     }
 
     /**
@@ -41,13 +39,7 @@ public interface FieldParser {
      * @param value             The parsing value
      * @return true if the argument matches the parameter, false otherwise
      */
-     default boolean checkValue(Parameter parameter, String value){
-         try {
-             IValueValidator validator  = parameter.validateValueWith().getDeclaredConstructor().newInstance();
-             return validator.validate(value, parameter.regex());
-         } catch (IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e){
-             return false;
-         }
-
+    default boolean checkValue(Parameter parameter, String value) {
+        return parameter.view().isEmpty() || value.matches(parameter.view());
     }
 }

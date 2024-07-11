@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+/**
+ *  Class for saving a receipt (to CSVFile)
+ */
 
 public class ReceiptSaver {
 
@@ -29,15 +32,25 @@ public class ReceiptSaver {
     private Path path;
     private final String CSVDelimiter = ";";
 
+    /**
+     * Generates and saves the receipt.
+     *
+     * @param receipt the receipt to generate
+     * @param filePath the file path to save the receipt
+     * @throws IOException if there is an IO error
+     */
     public void generateCheck(Receipt receipt, String filePath) throws IOException {
-
         this.path = Path.of(filePath);
         Files.write(path, new ArrayList<>(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
         composeCheck(receipt);
     }
 
-
+    /**
+     * Composes the receipt by creating its different sections.
+     *
+     * @param receipt the receipt to compose
+     * @throws IOException if there is an IO error
+     */
     public void composeCheck(Receipt receipt) throws IOException {
         createHeader();
         createBody(receipt.getOrder());
@@ -45,33 +58,53 @@ public class ReceiptSaver {
         createFooter(receipt.getOrder());
     }
 
+    /**
+     * Creates the header section of the receipt.
+     *
+     * @throws IOException if there is an IO error
+     */
     private void createHeader() throws IOException {
         LocalDateTime now = LocalDateTime.now();
         List<String> lines = new ArrayList<>();
         lines.add(concat(META_HEADER));
         lines.add(concat(new String[]{now.format(dateFormatter), now.format(timeFormatter)}));
-
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
+    /**
+     * Creates the body section of the receipt.
+     *
+     * @param order the order to include in the receipt
+     * @throws IOException if there is an IO error
+     */
     private void createBody(Order order) throws IOException {
         List<String> lines = new ArrayList<>();
         lines.add(concat(BODY_HEADER));
         order.getGoodsList().forEach(item -> addItemToList(item, lines));
-
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
+    /**
+     * Creates the discount section of the receipt.
+     *
+     * @param discountCard the discount card to include in the receipt
+     * @throws IOException if there is an IO error
+     */
     private void createDiscountSection(DiscountCard discountCard) throws IOException {
         if (discountCard != null) {
             List<String> lines = new ArrayList<>();
             lines.add(concat(DISCOUNT_SECTION_HEADER));
             addDiscountToList(discountCard, lines);
-
             Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         }
     }
 
+    /**
+     * Creates the footer section of the receipt.
+     *
+     * @param order the order to include in the receipt
+     * @throws IOException if there is an IO error
+     */
     private void createFooter(Order order) throws IOException {
         List<String> lines = new ArrayList<>();
         lines.add(concat(FOOTER_HEADER));
@@ -79,9 +112,10 @@ public class ReceiptSaver {
                 formatPrice(order.getTotalPrice()) + "$",
                 formatPrice(order.getTotalPrice() - order.getTotalWithDiscount()) + "$",
                 formatPrice(order.getTotalWithDiscount()) + "$"));
-
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
+
+    // Helper methods for adding items and formatting
 
     private void addDiscountToList(DiscountCard card, List<String> lines) {
         lines.add(String.join(CSVDelimiter,
