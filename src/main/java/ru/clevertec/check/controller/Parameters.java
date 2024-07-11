@@ -16,12 +16,16 @@ public class Parameters {
 
     @Parameter(name = "discountCard=", view = "\\d{4}", required = false)
     private Integer discountCardNumber = 0;
+    
     @Parameter(name = "balanceDebitCard=")
     private Double balanceDebitCard;
+   
     @Parameter(view = "^\\d{1,8}-\\d{1,8}$")
     private Map<Integer, Integer> selectedProducts = new HashMap<>();
+   
     @Parameter(name = "pathToFile=")
     private String pathToFile;
+   
     @Parameter(name = "saveToFile=")
     private String saveToFile;
 
