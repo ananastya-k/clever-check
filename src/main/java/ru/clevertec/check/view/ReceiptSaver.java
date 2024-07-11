@@ -32,6 +32,7 @@ public class ReceiptSaver {
     private Path path;
     private final String CSVDelimiter = ";";
 
+    private final String emptyLine ="";
     /**
      * Generates and saves the receipt.
      *
@@ -68,6 +69,7 @@ public class ReceiptSaver {
         List<String> lines = new ArrayList<>();
         lines.add(concat(META_HEADER));
         lines.add(concat(new String[]{now.format(dateFormatter), now.format(timeFormatter)}));
+        lines.add(emptyLine);
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
@@ -81,6 +83,7 @@ public class ReceiptSaver {
         List<String> lines = new ArrayList<>();
         lines.add(concat(BODY_HEADER));
         order.getGoodsList().forEach(item -> addItemToList(item, lines));
+        lines.add(emptyLine);
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 
@@ -95,6 +98,7 @@ public class ReceiptSaver {
             List<String> lines = new ArrayList<>();
             lines.add(concat(DISCOUNT_SECTION_HEADER));
             addDiscountToList(discountCard, lines);
+            lines.add(emptyLine);
             Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         }
     }
@@ -112,6 +116,7 @@ public class ReceiptSaver {
                 formatPrice(order.getTotalPrice()) + "$",
                 formatPrice(order.getTotalPrice() - order.getTotalWithDiscount()) + "$",
                 formatPrice(order.getTotalWithDiscount()) + "$"));
+        lines.add(emptyLine);
         Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }
 

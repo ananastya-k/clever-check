@@ -73,7 +73,7 @@ public class CommandLineParser {
         Field[] fields = target.getClass().getDeclaredFields();
 
         for(Field field:fields){
-            if (field.getAnnotation(Parameter.class).required()) {
+            if (field.isAnnotationPresent(Parameter.class) && field.getAnnotation(Parameter.class).required()) {
                 field.setAccessible(true);
                 isEmpty(field.get(target));
                 field.setAccessible(false);

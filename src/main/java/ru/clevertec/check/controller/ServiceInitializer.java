@@ -14,17 +14,8 @@ public class ServiceInitializer {
     private ProductService productService;
     private DiscountCardService discountCardService;
     private final String PATH_TO_CARDS_FILE = "./src/main/resources/discountCards.csv";
-    private final String PATH_TO_PRODUCT_FILE;
+    private final String PATH_TO_PRODUCT_FILE = "./src/main/resources/products.csv";
 
-    /**
-     * Constructor to set the path to the product file.
-     *
-     * @param pathToProduct the path to the product file
-     */
-    public ServiceInitializer( String pathToProduct){
-
-        this.PATH_TO_PRODUCT_FILE = pathToProduct;
-    }
 
     /**
      * Processes the services by checking file existence and loading the data.

@@ -60,7 +60,7 @@ public class ReceiptProcessor {
         if (order.getTotalWithDiscount() > parameters.balanceDebitCard) {
             ErrorHandler.writeToErrorFile("NOT ENOUGH MONEY",
                     String.format("Total price with discount: %.2f$. Balance debit card: %.2f$",
-                            order.getTotalWithDiscount(), parameters.balanceDebitCard), parameters.saveToFile);
+                            order.getTotalWithDiscount(), parameters.balanceDebitCard));
         }
     }
 
@@ -73,9 +73,9 @@ public class ReceiptProcessor {
         try {
             System.out.println(receipt.toString());
             ReceiptSaver printer = new ReceiptSaver();
-            printer.generateCheck(receipt, parameters.saveToFile);
+            printer.generateCheck(receipt, parameters.PATH_TO_SAVE);
         } catch (IOException e) {
-            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage(), parameters.saveToFile);
+            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage(), parameters.PATH_TO_SAVE);
         }
     }
 }

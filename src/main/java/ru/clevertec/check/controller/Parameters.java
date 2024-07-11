@@ -20,11 +20,8 @@ public class Parameters {
     protected Double balanceDebitCard;
     @Parameter(view = "^\\d{1,8}-\\d{1,8}$")
     protected Map<Integer, Integer> selectedProducts = new HashMap<>();
-    @Parameter(name = "pathToFile=")
-    protected String pathToFile;
-    @Parameter(name = "saveToFile=")
-    protected String saveToFile;
 
+    protected final String PATH_TO_SAVE = "./result.csv";
     /**
      * Initializes parameters from command line arguments.
      *

@@ -14,6 +14,7 @@ public class AppController {
 
     private ServiceInitializer services;
 
+
     /**
      * Starts the application with given arguments.
      *
@@ -24,33 +25,20 @@ public class AppController {
             parameters = new Parameters();
             parameters.init(args);
 
-            services = new ServiceInitializer(parameters.pathToFile);
+            services = new ServiceInitializer();
             services.processServices();
 
             ReceiptProcessor receiptProcessor = new ReceiptProcessor(parameters, services);
             receiptProcessor.processReceipt();
 
         }  catch (BadRequestException e) {
-            handleError("BAD REQUEST", e.getMessage());
+            ErrorHandler.writeToErrorFile("BAD REQUEST", e.getMessage());
 
         } catch (IntertalServerException | IllegalAccessException | IOException e) {
-            handleError("INTERNAL SERVER ERROR", e.getMessage());
+            ErrorHandler.writeToErrorFile("INTERNAL SERVER ERROR", e.getMessage());
         }
     }
 
-    /**
-     * Handles errors by writing them to a file if specified.
-     *
-     * @param errorType the type of error
-     * @param message the error message
-     */
-    private void handleError(String errorType, String message) {
-        if ( parameters.saveToFile != null) {
-            ErrorHandler.writeToErrorFile(errorType, message,  parameters.saveToFile);
-        } else {
-            ErrorHandler.writeToErrorFile(errorType, message);
-        }
-    }
 
 
 }
