@@ -19,9 +19,11 @@
 
 3. Запустить проект:
    
-    MacOS/Linux 
+    MacOS/Linux:
+   
     java -cp src ./src/main/java/ru/clevertec/check/CheckRunner.java id-quantity discountCard=xxxx balanceDebitCard=xxxx
 
-    Windows
+    Windows:
+   
     java /src/main/java/ru/clevertec/check/CheckRunner.java id-quantity discountCard=xxxx balanceDebitCard=xxxx
    
