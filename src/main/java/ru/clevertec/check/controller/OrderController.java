@@ -51,7 +51,7 @@ public class OrderController {
     private Order assemblyOrder(List<Goods> items){
 
         Order order = new Order();
-        order.setCurrentBalance(parameters.balanceDebitCard);
+        order.setCurrentBalance(parameters.getBalance());
         items.forEach(item-> {
             order.increaseTotalWithDiscount(item.getTotalWithDiscount());
             order.increaseTotalPrice(item.getTotalPrice());}
@@ -72,14 +72,14 @@ public class OrderController {
 
         List<Goods> itemsToAdd = new ArrayList<>();
 
-        for (Integer key : parameters.selectedProducts.keySet()) {
+        for (Integer key : parameters.getSelectedProducts().keySet()) {
             Product product = ps.getProductById(key).orElseThrow(() -> new BadRequestException("Product with id: " + key + " not found"));
 
-            if (product.getQuantity() < parameters.selectedProducts.get(key)) {
+            if (product.getQuantity() < parameters.getSelectedProducts().get(key)) {
                 throw new BadRequestException("Insufficient quantity for product with id: " + key + ". There are " + product.getQuantity() + " in stock");
             }
 
-            Goods item = createGoods(product, parameters.selectedProducts.get(key));
+            Goods item = createGoods(product, parameters.getSelectedProducts().get(key));
             itemsToAdd.add(item);
         }
         return itemsToAdd;

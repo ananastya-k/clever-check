@@ -15,11 +15,13 @@ import java.util.Map;
 public class Parameters {
 
     @Parameter(name = "discountCard=", view = "\\d{4}", required = false)
-    protected Integer discountCardNumber = 0;
+    private Integer discountCardNumber = 0;
+
     @Parameter(name = "balanceDebitCard=")
-    protected Double balanceDebitCard;
+    private Double balanceDebitCard;
+
     @Parameter(view = "^\\d{1,8}-\\d{1,8}$")
-    protected Map<Integer, Integer> selectedProducts = new HashMap<>();
+    private Map<Integer, Integer> selectedProducts = new HashMap<>();
 
     protected final String PATH_TO_SAVE = "./result.csv";
     /**
@@ -33,6 +35,30 @@ public class Parameters {
     public void init(String[] args) throws BadRequestException, IntertalServerException, IllegalAccessException {
             CommandLineParser cl = new CommandLineParser(args, this);
             cl.parse();
+    }
+
+    public Integer getDCardNumber() {
+        return discountCardNumber;
+    }
+
+    public void setDCardNumber(Integer discountCardNumber) {
+        this.discountCardNumber = discountCardNumber;
+    }
+
+    public Double getBalance() {
+        return balanceDebitCard;
+    }
+
+    public void setBalance(Double balanceDebitCard) {
+        this.balanceDebitCard = balanceDebitCard;
+    }
+
+    public Map<Integer, Integer> getSelectedProducts() {
+        return selectedProducts;
+    }
+
+    public void setSelectedProducts(Map<Integer, Integer> selectedProducts) {
+        this.selectedProducts = selectedProducts;
     }
 
 }
